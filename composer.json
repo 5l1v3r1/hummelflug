@@ -1,0 +1,44 @@
+{
+    "name": "scheddel/hummelflug",
+    "type": "project",
+    "description": "A utility for arming (creating) many bumblebees (micro EC2 instances) to attack (load test) targets (web applications).",
+    "keywords": [],
+    "homepage": "https://github.com/scheddel/hummelflug",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Karl Valentin",
+            "email": "karl.valentin@kvis.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/debug": "~2.8|~3.0",
+        "aws/aws-sdk-php": "^3.21"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/filesystem": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "symfony/event-dispatcher": "",
+        "symfony/filesystem": "",
+        "symfony/process": "",
+        "psr/log": "For using the console logger"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Console\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.2-dev"
+        }
+    }
+}
