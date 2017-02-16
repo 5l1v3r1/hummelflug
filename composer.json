@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "ext-ssh2": "*",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/debug": "~2.8|~3.0",
-        "aws/aws-sdk-php": "^3.21",
-        "herzult/php-ssh": "^1.1"
+        "aws/aws-sdk-php": "^3.21"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.8|~3.0",
