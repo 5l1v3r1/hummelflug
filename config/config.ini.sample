@@ -1,0 +1,20 @@
+[main]
+region = "us-east-1"
+AMI = "ami-7a3dd76c"
+endpoint = "ec2.us-east-1.amazonaws.com"
+keypair = "hummelflug"
+
+[storage]
+csv[type] = "\\Hummelflug\\Result\\Storage\\CsvStorage"
+csv[summaryPath] = "storage/log/hummelflug.csv"
+csv[detailsPath] = "storage/log/hummelflug-details.csv"
+db[type] = "\\Hummelflug\\Result\\Storage\\PdoStorage"
+db[dsn] = "mysql:host=localhost;dbname=hummelflug"
+db[username] = "hummelflug"
+db[password] = "hummelflug"
+db[summaryTable] = "loadtest"
+db[summaryTableMapping] = '{"Start":"started", "ElapsedTime":"elapsed_time","Concurrency":"concurrency","Availability":"availability","ResponseTimeAverage":"responsetime_average","Throughput":"throughput","Mark":"type"}'
+
+[credentials]
+AWSAccessKeyId=<AWSAccessKeyId>
+AWSSecretKey=<AWSSecretKey>

@@ -4,11 +4,18 @@
 require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\AttackCommand;
+use Symfony\Component\Console\Command\CreateCommand;
+use Symfony\Component\Console\Command\DownCommand;
+use Symfony\Component\Console\Command\UpCommand;
 
 $application = new Application();
 
 $application->setName('Hummelflug');
 
-// ... register commands
+$application->add(new AttackCommand());
+$application->add(new CreateCommand());
+$application->add(new DownCommand());
+$application->add(new UpCommand());
 
 $application->run();

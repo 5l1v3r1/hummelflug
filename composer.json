@@ -15,7 +15,8 @@
         "php": ">=5.5.9",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/debug": "~2.8|~3.0",
-        "aws/aws-sdk-php": "^3.21"
+        "aws/aws-sdk-php": "^3.21",
+        "herzult/php-ssh": "^1.1"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.8|~3.0",
@@ -30,7 +31,10 @@
         "psr/log": "For using the console logger"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Console\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Console\\": "",
+            "Hummelflug\\": "Hummelflug"
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]
