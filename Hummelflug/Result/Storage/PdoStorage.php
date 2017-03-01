@@ -87,7 +87,7 @@ class PdoStorage implements StorageInterface
             $value = $resultSet->$method();
 
             if ($value instanceof \DateTime) {
-                $value = $value->format('Y-m-d h:i:s');
+                $value = $value->format('Y-m-d H:i:s');
             }
 
             $values[] =  $value;
@@ -132,7 +132,7 @@ class PdoStorage implements StorageInterface
                 $value = $result->$method();
 
                 if ($value instanceof \DateTime) {
-                    $value = $value->format('Y-m-d h:i:s');
+                    $value = $value->format('Y-m-d H:i:s');
                 }
 
                 $values[] =  $value;
