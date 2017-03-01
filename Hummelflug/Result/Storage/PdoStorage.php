@@ -32,6 +32,16 @@ class PdoStorage implements StorageInterface
     private $summaryTable;
 
     /**
+     * @var array
+     */
+    private $detailsTableMapping;
+
+    /**
+     * @var string
+     */
+    private $detailsTable;
+
+    /**
      * @var \PDO
      */
     private $dbh;
@@ -45,6 +55,7 @@ class PdoStorage implements StorageInterface
         $this->dbh = new \PDO($this->dsn, $this->username, $this->password);
 
         $this->storeSummary($resultSet);
+        $this->storeDetails($resultSet);
     }
 
     private function storeSummary(ResultSetInterface $resultSet)
@@ -55,6 +66,50 @@ class PdoStorage implements StorageInterface
 
         if ($this->summaryTableMapping === null) {
             $this->summaryTableMapping = $this->getDefaultSummaryTableMapping($resultSet);
+        }
+
+        $sql = 'INSERT INTO ' . $this->summaryTable . ' '
+             . '(' . implode(', ', array_values($this->summaryTableMapping)) . ') '
+             . 'VALUES '
+             . '(' . implode(', ', array_fill(0, count($this->summaryTableMapping), '?')) . ')';
+
+        $statement = $this->dbh->prepare($sql);
+
+        $values = [];
+
+        foreach ($this->summaryTableMapping as $key => $value) {
+            $method = 'get' . $key;
+
+            if (!method_exists($resultSet, $method)) {
+                throw new \Exception('Invalid mapping key: ' . $key);
+            }
+
+            $value = $resultSet->$method();
+
+            if ($value instanceof \DateTime) {
+                $value = $value->format('Y-m-d h:i:s');
+            }
+
+            $values[] =  $value;
+        }
+
+        $res = $statement->execute($values);
+
+        if ($res === false) {
+            throw new \Exception('Could not store summary: ' . $statement->errorInfo()[2]);
+        }
+
+        return $this;
+    }
+
+    private function storeDetails(ResultSetInterface $resultSet)
+    {
+        if ($this->detailsTable === null) {
+            return;
+        }
+
+        if ($this->detailsTableMapping === null) {
+            $this->detailsTableMapping = $this->getDefaultDetailsTableMapping($resultSet);
         }
 
         $sql = 'INSERT INTO ' . $this->summaryTable . ' '
@@ -193,4 +248,54 @@ class PdoStorage implements StorageInterface
 
         return $mapping;
     }
+
+    private function getDefaultDetailsTableMapping(ResultSetInterface $resultSet)
+    {
+        $mapping = [];
+
+        foreach (get_class_methods(get_class($resultSet->getResults()[0])) as $method) {
+            if (strpos($method, 'get') !== 0) {
+                continue;
+            }
+
+            $key = str_replace('get', '', $method);
+
+            $mapping[$key] = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+        }
+
+        return $mapping;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDetailsTableMapping()
+    {
+        return $this->detailsTableMapping;
+    }
+
+    /**
+     * @param array $detailsTableMapping
+     */
+    public function setDetailsTableMapping($detailsTableMapping)
+    {
+        $this->detailsTableMapping = $detailsTableMapping;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDetailsTable()
+    {
+        return $this->detailsTable;
+    }
+
+    /**
+     * @param string $detailsTable
+     */
+    public function setDetailsTable($detailsTable)
+    {
+        $this->detailsTable = $detailsTable;
+    }
+
 }
