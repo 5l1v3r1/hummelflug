@@ -112,35 +112,37 @@ class PdoStorage implements StorageInterface
             $this->detailsTableMapping = $this->getDefaultDetailsTableMapping($resultSet);
         }
 
-        $sql = 'INSERT INTO ' . $this->summaryTable . ' '
-             . '(' . implode(', ', array_values($this->summaryTableMapping)) . ') '
+        $sql = 'INSERT INTO ' . $this->detailsTable . ' '
+             . '(' . implode(', ', array_values($this->detailsTableMapping)) . ') '
              . 'VALUES '
-             . '(' . implode(', ', array_fill(0, count($this->summaryTableMapping), '?')) . ')';
+             . '(' . implode(', ', array_fill(0, count($this->detailsTableMapping), '?')) . ')';
 
         $statement = $this->dbh->prepare($sql);
 
-        $values = [];
+        foreach ($resultSet->getResults() as $result) {
+            $values = [];
 
-        foreach ($this->summaryTableMapping as $key => $value) {
-            $method = 'get' . $key;
+            foreach ($this->detailsTableMapping as $key => $value) {
+                $method = 'get' . $key;
 
-            if (!method_exists($resultSet, $method)) {
-                throw new \Exception('Invalid mapping key: ' . $key);
+                if (!method_exists($result, $method)) {
+                    throw new \Exception('Invalid mapping key: ' . $key);
+                }
+
+                $value = $result->$method();
+
+                if ($value instanceof \DateTime) {
+                    $value = $value->format('Y-m-d h:i:s');
+                }
+
+                $values[] =  $value;
             }
 
-            $value = $resultSet->$method();
+            $res = $statement->execute($values);
 
-            if ($value instanceof \DateTime) {
-                $value = $value->format('Y-m-d h:i:s');
+            if ($res === false) {
+                throw new \Exception('Could not store details: ' . $statement->errorInfo()[2]);
             }
-
-            $values[] =  $value;
-        }
-
-        $res = $statement->execute($values);
-
-        if ($res === false) {
-            throw new \Exception('Could not store summary: ' . $statement->errorInfo()[2]);
         }
 
         return $this;
