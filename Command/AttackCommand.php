@@ -122,7 +122,7 @@ class AttackCommand extends Command
             $this->url = $input->getArgument('URL');
         }
 
-        $this->configuration = parse_ini_file('config/config.ini', true);
+        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         foreach ($this->configuration['storage'] as $storageConfiguration) {
             $this->storages[] = StorageFactory::create($storageConfiguration);
@@ -148,7 +148,7 @@ class AttackCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $swarm = json_decode(file_get_contents('config/swarm.json'));
+        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
 
         $output->writeln('<info>Starting the attack.</info>');
         $this->start = new \DateTime();
@@ -179,7 +179,7 @@ class AttackCommand extends Command
 
         $results = $this->getResults();
 
-        $this->storeResults($results);
+        $this->storeResults($results, $output);
         $this->displayResults($results, $input, $output);
     }
 
@@ -264,8 +264,8 @@ class AttackCommand extends Command
         $res = ssh2_auth_pubkey_file(
             $con,
             'ec2-user',
-            '.ssh/' . $this->keyPairName . '.pub',
-            '.ssh/' . $this->keyPairName
+            __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub',
+            __DIR__ . '/../.ssh/' . $this->keyPairName
         );
 
         if (!is_null($this->file)) {
@@ -370,10 +370,14 @@ class AttackCommand extends Command
         );
     }
 
-    private function storeResults(ResultSetInterface $results)
+    private function storeResults(ResultSetInterface $results, OutputInterface $output)
     {
         foreach ($this->storages as $storage) {
-            $storage->store($results);
+            try {
+                $storage->store($results);
+            } catch (\Exception $e) {
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
+            }
         }
     }
 }

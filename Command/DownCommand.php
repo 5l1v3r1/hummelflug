@@ -48,7 +48,7 @@ class DownCommand extends Command
         $this->keyPairName = $input->getOption('keypair');
         $this->securityGroupName = $input->getOption('groupname');
 
-        $this->configuration = parse_ini_file('config/config.ini', true);
+        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         $this->client = new Ec2Client([
             'key' => $this->configuration['credentials']['AWSAccessKeyId'],
@@ -67,7 +67,7 @@ class DownCommand extends Command
     {
         $output->writeln('<info>Shutting down the swarm.</info>');
 
-        $swarm = json_decode(file_get_contents('config/swarm.json'));
+        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
 
         $this->client->stopInstances(
             [

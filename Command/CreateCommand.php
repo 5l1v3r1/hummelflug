@@ -89,7 +89,7 @@ class CreateCommand extends Command
         $this->keyPairName = $input->getOption('keypair');
         $this->securityGroupName = $input->getOption('groupname');
 
-        $this->configuration = parse_ini_file('config/config.ini', true);
+        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         $this->client = new Ec2Client([
             'key' => $this->configuration['credentials']['AWSAccessKeyId'],
@@ -102,14 +102,14 @@ class CreateCommand extends Command
             throw new \Exception('Could not create client.');
         }
 
-        if (!file_exists('.ssh/' . $this->keyPairName)) {
+        if (!file_exists(__DIR__ . '/../.ssh/' . $this->keyPairName)) {
             exec('ssh-keygen -q -f .ssh/hummelflug -N \'\'');
 
             try {
                 $keyPair = $this->client->importKeyPair([
                     'KeyName' => $this->keyPairName,
                     'PublicKeyMaterial' => file_get_contents(
-                        '.ssh/' . $this->keyPairName . '.pub'
+                        __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub'
                     )
                 ]);
 
@@ -117,8 +117,8 @@ class CreateCommand extends Command
                     throw new \Exception('Could not import keypair.');
                 }
 
-                chmod('.ssh/' . $this->keyPairName, 0400);
-                chmod('.ssh/' . $this->keyPairName . '.pub', 0400);
+                chmod(__DIR__ . '/../.ssh/' . $this->keyPairName, 0400);
+                chmod(__DIR__ . '/../.ssh/' . $this->keyPairName . '.pub', 0400);
             } catch (Ec2Exception $e) {
                 //todo: handle exception
                 throw $e;
@@ -259,8 +259,8 @@ class CreateCommand extends Command
         $res = ssh2_auth_pubkey_file(
             $con,
             'ec2-user',
-            '.ssh/' . $this->keyPairName . '.pub',
-            '.ssh/' . $this->keyPairName
+            __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub',
+            __DIR__ . '/../.ssh/' . $this->keyPairName
         );
 
         $output->writeln('<info>done.</info>');
@@ -287,15 +287,15 @@ class CreateCommand extends Command
             ]
         );
 
-        $sem = sem_get(ftok('config/swarm.json', 0));
+        $sem = sem_get(ftok(__DIR__ . '/../config/swarm.json', 0));
 
         sem_acquire($sem);
 
-        $swarm = json_decode(file_get_contents('config/swarm.json'));
+        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
 
         $swarm->instances[] = $instanceId;
 
-        file_put_contents('config/swarm.json', json_encode($swarm));
+        file_put_contents(__DIR__ . '/../config/swarm.json', json_encode($swarm));
 
         sem_release($sem);
 

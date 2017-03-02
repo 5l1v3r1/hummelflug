@@ -48,7 +48,7 @@ class UpCommand extends Command
         $this->keyPairName = $input->getOption('keypair');
         $this->securityGroupName = $input->getOption('groupname');
 
-        $this->configuration = parse_ini_file('config/config.ini', true);
+        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         $this->client = new Ec2Client([
             'key' => $this->configuration['credentials']['AWSAccessKeyId'],
@@ -64,7 +64,7 @@ class UpCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $swarm = json_decode(file_get_contents('config/swarm.json'));
+        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
 
         $output->writeln('<info>Waking up the swarm.</info>');
 
