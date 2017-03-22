@@ -92,8 +92,10 @@ class CreateCommand extends Command
         $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         $this->client = new Ec2Client([
-            'key' => $this->configuration['credentials']['AWSAccessKeyId'],
-            'secret' => $this->configuration['credentials']['AWSSecretKey'],
+            'credentials' => [
+                'key' => $this->configuration['credentials']['AWSAccessKeyId'],
+                'secret' => $this->configuration['credentials']['AWSSecretKey'],
+            ],
             'region' => $this->configuration['main']['region'],
             'version' => '2016-11-15',
         ]);
