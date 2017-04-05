@@ -101,6 +101,18 @@ class AttackCommand extends Command
                 '-i',
                 InputOption::VALUE_NONE,
                 'INTERNET user simulation, hits URLs randomly.'
+            )
+            ->addOption(
+                'AWSAccessKeyId',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'AWSAccessKeyId'
+            )
+            ->addOption(
+                'AWSSecretKey',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'AWSSecretKey'
             );
     }
 
@@ -130,10 +142,13 @@ class AttackCommand extends Command
 
         $this->keyPairName = $this->configuration['main']['keypair'];
 
+        $awsKeyId = $input->getOption('AWSAccessKeyId');
+        $awsSecretKey = $input->getOption('AWSSecretKey');
+
         $this->client = new Ec2Client([
             'credentials' => [
-                'key' => $this->configuration['credentials']['AWSAccessKeyId'],
-                'secret' => $this->configuration['credentials']['AWSSecretKey'],
+                'key' => $awsKeyId ?: $this->configuration['credentials']['AWSAccessKeyId'],
+                'secret' => $awsSecretKey ?: $this->configuration['credentials']['AWSSecretKey'],
             ],
             'region' => $this->configuration['main']['region'],
             'version' => '2016-11-15',

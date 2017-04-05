@@ -54,6 +54,18 @@ class CreateCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Provide a security group name, please!',
                 $this->defaultSecurityGroupName
+            )
+            ->addOption(
+                'AWSAccessKeyId',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'AWSAccessKeyId'
+            )
+            ->addOption(
+                'AWSSecretKey',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'AWSSecretKey'
             );
     }
 
@@ -89,12 +101,15 @@ class CreateCommand extends Command
         $this->keyPairName = $input->getOption('keypair');
         $this->securityGroupName = $input->getOption('groupname');
 
+        $awsKeyId = $input->getOption('AWSAccessKeyId');
+        $awsSecretKey = $input->getOption('AWSSecretKey');
+
         $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
 
         $this->client = new Ec2Client([
             'credentials' => [
-                'key' => $this->configuration['credentials']['AWSAccessKeyId'],
-                'secret' => $this->configuration['credentials']['AWSSecretKey'],
+                'key' => $awsKeyId ?: $this->configuration['credentials']['AWSAccessKeyId'],
+                'secret' => $awsSecretKey ?: $this->configuration['credentials']['AWSSecretKey'],
             ],
             'region' => $this->configuration['main']['region'],
             'version' => '2016-11-15',
