@@ -35,6 +35,18 @@ class CreateCommand extends Command
             ->setDescription('Creates new bumblebees.')
             ->setHelp('Creates new bumblebees.')
             ->addOption(
+                'config',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
+            )
+            ->addOption(
                 'count',
                 '-c',
                 InputOption::VALUE_REQUIRED,
@@ -104,7 +116,17 @@ class CreateCommand extends Command
         $awsKeyId = $input->getOption('AWSAccessKeyId');
         $awsSecretKey = $input->getOption('AWSSecretKey');
 
-        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
+        if (!is_null($input->getOption('config'))) {
+            $configFile = $input->getOption('config');
+        } else {
+            $configFile = __DIR__ . '/../config/config.ini';
+        }
+
+        if (!file_exists($configFile)) {
+            throw new \Exception('Configuration file ' . $configFile . ' does not exists.');
+        }
+
+        $this->configuration = parse_ini_file($configFile, true);
 
         $this->client = new Ec2Client([
             'credentials' => [
@@ -304,15 +326,25 @@ class CreateCommand extends Command
             ]
         );
 
-        $sem = sem_get(ftok(__DIR__ . '/../config/swarm.json', 0));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $sem = sem_get(ftok($swarmFile, 0));
 
         sem_acquire($sem);
 
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $swarm->instances[] = $instanceId;
 
-        file_put_contents(__DIR__ . '/../config/swarm.json', json_encode($swarm));
+        file_put_contents($swarmFile, json_encode($swarm));
 
         sem_release($sem);
 

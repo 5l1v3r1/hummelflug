@@ -70,6 +70,18 @@ class AttackCommand extends Command
                 'URL of the target to attack.'
             )
             ->addOption(
+                'config',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
+            )
+            ->addOption(
                 'concurrent',
                 '-c',
                 InputOption::VALUE_REQUIRED,
@@ -134,7 +146,17 @@ class AttackCommand extends Command
             $this->url = $input->getArgument('URL');
         }
 
-        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
+        if (!is_null($input->getOption('config'))) {
+            $configFile = $input->getOption('config');
+        } else {
+            $configFile = __DIR__ . '/../config/config.ini';
+        }
+
+        if (!file_exists($configFile)) {
+            throw new \Exception('Configuration file ' . $configFile . ' does not exists.');
+        }
+
+        $this->configuration = parse_ini_file($configFile, true);
 
         foreach ($this->configuration['storage'] as $storageConfiguration) {
             $this->storages[] = StorageFactory::create($storageConfiguration);
@@ -165,7 +187,17 @@ class AttackCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $output->writeln('<info>Starting the attack.</info>');
         $this->start = new \DateTime();
