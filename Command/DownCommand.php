@@ -29,9 +29,15 @@ class DownCommand extends Command
             ->setHelp('Let all the bumblebees fall asleep.')
             ->addOption(
                 'config',
-                '-c',
+                null,
                 InputOption::VALUE_REQUIRED,
-                'Provide a keypair name, please!'
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
             )
             ->addOption(
                 'keypair',
@@ -100,7 +106,17 @@ class DownCommand extends Command
     {
         $output->writeln('<info>Shutting down the swarm.</info>');
 
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $this->client->stopInstances(
             [

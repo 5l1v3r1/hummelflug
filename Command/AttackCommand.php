@@ -71,9 +71,15 @@ class AttackCommand extends Command
             )
             ->addOption(
                 'config',
-                '-c',
+                null,
                 InputOption::VALUE_REQUIRED,
-                'Provide a keypair name, please!'
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
             )
             ->addOption(
                 'concurrent',
@@ -181,7 +187,17 @@ class AttackCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $output->writeln('<info>Starting the attack.</info>');
         $this->start = new \DateTime();

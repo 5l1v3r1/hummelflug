@@ -29,9 +29,15 @@ class UpCommand extends Command
             ->setHelp('Wakes up all the bumblebees.')
             ->addOption(
                 'config',
-                '-c',
+                null,
                 InputOption::VALUE_REQUIRED,
-                'Provide a keypair name, please!'
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
             )
             ->addOption(
                 'keypair',
@@ -97,7 +103,17 @@ class UpCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $output->writeln('<info>Waking up the swarm.</info>');
 

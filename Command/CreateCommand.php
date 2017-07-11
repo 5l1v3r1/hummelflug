@@ -36,9 +36,15 @@ class CreateCommand extends Command
             ->setHelp('Creates new bumblebees.')
             ->addOption(
                 'config',
-                '-c',
+                null,
                 InputOption::VALUE_REQUIRED,
-                'Provide a keypair name, please!'
+                'Provide the path to the config file, please!'
+            )
+            ->addOption(
+                'swarm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the swarm file, please!'
             )
             ->addOption(
                 'count',
@@ -320,15 +326,25 @@ class CreateCommand extends Command
             ]
         );
 
-        $sem = sem_get(ftok(__DIR__ . '/../config/swarm.json', 0));
+        if (!is_null($input->getOption('swarm'))) {
+            $swarmFile = $input->getOption('swarm');
+        } else {
+            $swarmFile = __DIR__ . '/../config/swarm.json';
+        }
+
+        if (!file_exists($swarmFile)) {
+            throw new \Exception('Swarm file ' . $swarmFile . ' does not exists.');
+        }
+
+        $sem = sem_get(ftok($swarmFile, 0));
 
         sem_acquire($sem);
 
-        $swarm = json_decode(file_get_contents(__DIR__ . '/../config/swarm.json'));
+        $swarm = json_decode(file_get_contents($swarmFile));
 
         $swarm->instances[] = $instanceId;
 
-        file_put_contents(__DIR__ . '/../config/swarm.json', json_encode($swarm));
+        file_put_contents($swarmFile, json_encode($swarm));
 
         sem_release($sem);
 
