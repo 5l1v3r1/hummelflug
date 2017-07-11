@@ -70,6 +70,12 @@ class AttackCommand extends Command
                 'URL of the target to attack.'
             )
             ->addOption(
+                'config',
+                '-c',
+                InputOption::VALUE_REQUIRED,
+                'Provide a keypair name, please!'
+            )
+            ->addOption(
                 'concurrent',
                 '-c',
                 InputOption::VALUE_REQUIRED,
@@ -134,7 +140,17 @@ class AttackCommand extends Command
             $this->url = $input->getArgument('URL');
         }
 
-        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
+        if (!is_null($input->getOption('config'))) {
+            $configFile = $input->getOption('config');
+        } else {
+            $configFile = __DIR__ . '/../config/config.ini';
+        }
+
+        if (!file_exists($configFile)) {
+            throw new \Exception('Configuration file ' . $configFile . ' does not exists.');
+        }
+
+        $this->configuration = parse_ini_file($configFile, true);
 
         foreach ($this->configuration['storage'] as $storageConfiguration) {
             $this->storages[] = StorageFactory::create($storageConfiguration);

@@ -28,6 +28,12 @@ class UpCommand extends Command
             ->setDescription('Wakes up all the bumblebees.')
             ->setHelp('Wakes up all the bumblebees.')
             ->addOption(
+                'config',
+                '-c',
+                InputOption::VALUE_REQUIRED,
+                'Provide a keypair name, please!'
+            )
+            ->addOption(
                 'keypair',
                 '-k',
                 InputOption::VALUE_REQUIRED,
@@ -60,7 +66,17 @@ class UpCommand extends Command
         $this->keyPairName = $input->getOption('keypair');
         $this->securityGroupName = $input->getOption('groupname');
 
-        $this->configuration = parse_ini_file(__DIR__ . '/../config/config.ini', true);
+        if (!is_null($input->getOption('config'))) {
+            $configFile = $input->getOption('config');
+        } else {
+            $configFile = __DIR__ . '/../config/config.ini';
+        }
+
+        if (!file_exists($configFile)) {
+            throw new \Exception('Configuration file ' . $configFile . ' does not exists.');
+        }
+
+        $this->configuration = parse_ini_file($configFile, true);
 
         $awsKeyId = $input->getOption('AWSAccessKeyId');
         $awsSecretKey = $input->getOption('AWSSecretKey');
