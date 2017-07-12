@@ -28,6 +28,11 @@ class CreateCommand extends Command
     private $client;
     private $configuration;
 
+    /**
+     * @var string
+     */
+    private $keyFilePath;
+
     protected function configure()
     {
         $this
@@ -45,6 +50,12 @@ class CreateCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Provide the path to the swarm file, please!'
+            )
+            ->addOption(
+                'ssh-key-file-path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the SSH keyfiles, please!'
             )
             ->addOption(
                 'count',
@@ -128,6 +139,18 @@ class CreateCommand extends Command
 
         $this->configuration = parse_ini_file($configFile, true);
 
+        if ($input->getOption('ssh-key-file-path') !== null) {
+            $this->keyFilePath = $input->getOption('ssh-key-file-path');
+        } elseif (array_key_exists('keyfilepath', $this->configuration['main'])) {
+            $this->keyFilePath = $this->configuration['main']['keyfilepath'];
+        } else {
+            $this->keyFilePath = __DIR__ . '/../.ssh/';
+        }
+
+        if (substr($this->keyFilePath, -1) !== '/') {
+            $this->keyFilePath .= '/';
+        }
+
         $this->client = new Ec2Client([
             'credentials' => [
                 'key' => $awsKeyId ?: $this->configuration['credentials']['AWSAccessKeyId'],
@@ -141,14 +164,14 @@ class CreateCommand extends Command
             throw new \Exception('Could not create client.');
         }
 
-        if (!file_exists(__DIR__ . '/../.ssh/' . $this->keyPairName)) {
-            exec('ssh-keygen -q -f .ssh/hummelflug -N \'\'');
+        if (!file_exists($this->keyFilePath . $this->keyPairName)) {
+            exec('ssh-keygen -q -f ' . $this->keyFilePath . 'hummelflug -N \'\'');
 
             try {
                 $keyPair = $this->client->importKeyPair([
                     'KeyName' => $this->keyPairName,
                     'PublicKeyMaterial' => file_get_contents(
-                        __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub'
+                        __DIR__ . $this->keyFilePath . $this->keyPairName . '.pub'
                     )
                 ]);
 
@@ -156,8 +179,8 @@ class CreateCommand extends Command
                     throw new \Exception('Could not import keypair.');
                 }
 
-                chmod(__DIR__ . '/../.ssh/' . $this->keyPairName, 0400);
-                chmod(__DIR__ . '/../.ssh/' . $this->keyPairName . '.pub', 0400);
+                chmod($this->keyFilePath . $this->keyPairName, 0400);
+                chmod($this->keyFilePath . $this->keyPairName . '.pub', 0400);
             } catch (Ec2Exception $e) {
                 //todo: handle exception
                 throw $e;
@@ -298,8 +321,8 @@ class CreateCommand extends Command
         $res = ssh2_auth_pubkey_file(
             $con,
             'ec2-user',
-            __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub',
-            __DIR__ . '/../.ssh/' . $this->keyPairName
+            $this->keyFilePath . $this->keyPairName . '.pub',
+            $this->keyFilePath . $this->keyPairName
         );
 
         $output->writeln('<info>done.</info>');

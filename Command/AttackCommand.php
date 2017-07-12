@@ -58,6 +58,11 @@ class AttackCommand extends Command
      */
     private $mark;
 
+    /**
+     * @var string
+     */
+    private $keyFilePath;
+
     protected function configure()
     {
         $this
@@ -80,6 +85,12 @@ class AttackCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Provide the path to the swarm file, please!'
+            )
+            ->addOption(
+                'ssh-key-file-path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Provide the path to the SSH keyfiles, please!'
             )
             ->addOption(
                 'concurrent',
@@ -163,6 +174,14 @@ class AttackCommand extends Command
         }
 
         $this->keyPairName = $this->configuration['main']['keypair'];
+
+        if ($input->getOption('ssh-key-file-path') !== null) {
+            $this->keyFilePath = $input->getOption('ssh-key-file-path');
+        } elseif (array_key_exists('keyfilepath', $this->configuration['main'])) {
+            $this->keyFilePath = $this->configuration['main']['keyfilepath'];
+        } else {
+            $this->keyFilePath = __DIR__ . '/../.ssh/';
+        }
 
         $awsKeyId = $input->getOption('AWSAccessKeyId');
         $awsSecretKey = $input->getOption('AWSSecretKey');
@@ -313,8 +332,8 @@ class AttackCommand extends Command
         $res = ssh2_auth_pubkey_file(
             $con,
             'ec2-user',
-            __DIR__ . '/../.ssh/' . $this->keyPairName . '.pub',
-            __DIR__ . '/../.ssh/' . $this->keyPairName
+            $this->keyFilePath . $this->keyPairName . '.pub',
+            $this->keyFilePath . $this->keyPairName
         );
 
         if (!is_null($this->file)) {
