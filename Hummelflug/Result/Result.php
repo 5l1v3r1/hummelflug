@@ -216,7 +216,11 @@ class Result implements ResultInterface
      */
     public function getAvailability()
     {
-        return $this->transactionsSuccessful / ($this->transactionsSuccessful + $this->transactionsFailed);
+        if ($this->transactionsSuccessful + $this->transactionsFailed > 0) {
+            return $this->transactionsSuccessful / ($this->transactionsSuccessful + $this->transactionsFailed);
+        }
+
+        return 0;
     }
 
     /**
@@ -280,7 +284,11 @@ class Result implements ResultInterface
      */
     public function getThroughput()
     {
-        return $this->getDataTransferred() / $this->getElapsedTime();
+        if ($this->getElapsedTime() > 0) {
+            return $this->getDataTransferred() / $this->getElapsedTime();
+        }
+
+        return 0;
     }
 
     /**
