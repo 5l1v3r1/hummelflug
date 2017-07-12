@@ -183,6 +183,10 @@ class AttackCommand extends Command
             $this->keyFilePath = __DIR__ . '/../.ssh/';
         }
 
+        if (substr($this->keyFilePath, -1) !== '/') {
+            $this->keyFilePath .= '/';
+        }
+
         $awsKeyId = $input->getOption('AWSAccessKeyId');
         $awsSecretKey = $input->getOption('AWSSecretKey');
 

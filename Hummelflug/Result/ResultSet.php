@@ -98,7 +98,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
     {
         $transactions = $this->getTransactionsSuccessful() + $this->getTransactionsFailed();
 
-        return $transactions / $this->getElapsedTime();
+        if ($this->getElapsedTime() > 0) {
+            return $transactions / $this->getElapsedTime();
+        }
+
+        return 0;
     }
 
     /**
@@ -168,7 +172,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
     {
         $transactions = $this->getTransactionsSuccessful() + $this->getTransactionsFailed();
 
-        return $this->getTransactionsSuccessful() / $transactions;
+        if ($transactions > 0) {
+            return $this->getTransactionsSuccessful() / $transactions;
+        }
+
+        return 0;
     }
 
     /**
@@ -208,7 +216,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
      */
     public function getThroughput()
     {
-        return $this->getDataTransferred() / $this->getElapsedTime();
+        if ($this->getElapsedTime() > 0) {
+            return $this->getDataTransferred() / $this->getElapsedTime();
+        }
+
+        return 0;
     }
 
     /**
