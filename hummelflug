@@ -11,6 +11,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\AttackCommand;
 use Symfony\Component\Console\Command\CreateCommand;
 use Symfony\Component\Console\Command\DownCommand;
+use Symfony\Component\Console\Command\StatusCommand;
 use Symfony\Component\Console\Command\UpCommand;
 
 $application = new Application();
@@ -21,5 +22,6 @@ $application->add(new AttackCommand());
 $application->add(new CreateCommand());
 $application->add(new DownCommand());
 $application->add(new UpCommand());
+$application->add(new StatusCommand());
 
 $application->run();
