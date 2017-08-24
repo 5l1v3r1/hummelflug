@@ -33,7 +33,7 @@
     "autoload": {
         "psr-4": {
             "Symfony\\Component\\Console\\": "",
-            "Hummelflug\\": "Hummelflug"
+            "Hummelflug\\": "src/Hummelflug"
         },
         "exclude-from-classmap": [
             "/Tests/"
