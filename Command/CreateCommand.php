@@ -151,6 +151,12 @@ class CreateCommand extends Command
             $this->keyFilePath .= '/';
         }
 
+        if (!file_exists($this->keyFilePath)) {
+            if (false === @mkdir($this->keyFilePath, 0400, true)) {
+                throw new \Exception('Could not create key file path: ' . $this->keyFilePath);
+            }
+        }
+
         $this->client = new Ec2Client([
             'credentials' => [
                 'key' => $awsKeyId ?: $this->configuration['credentials']['AWSAccessKeyId'],
@@ -165,13 +171,15 @@ class CreateCommand extends Command
         }
 
         if (!file_exists($this->keyFilePath . $this->keyPairName)) {
-            exec('ssh-keygen -q -f ' . $this->keyFilePath . 'hummelflug -N \'\'');
+            chmod($this->keyFilePath, 0777);
+
+            exec('ssh-keygen -q -f ' . $this->keyFilePath . $this->keyPairName . ' -N \'\'');
 
             try {
                 $keyPair = $this->client->importKeyPair([
                     'KeyName' => $this->keyPairName,
                     'PublicKeyMaterial' => file_get_contents(
-                        __DIR__ . $this->keyFilePath . $this->keyPairName . '.pub'
+                        $this->keyFilePath . $this->keyPairName . '.pub'
                     )
                 ]);
 
@@ -215,7 +223,7 @@ class CreateCommand extends Command
                 ]
             ));
         } catch (Ec2Exception $e) {
-            //todo: handle exception
+            // nothing to do
         }
     }
 
@@ -227,7 +235,7 @@ class CreateCommand extends Command
             'ImageId'        => $this->configuration['main']['AMI'],
             'MinCount'       => 1,
             'MaxCount'       => 1,
-            'InstanceType'   => 't1.micro',
+            'InstanceType'   => 't2.micro',
             'KeyName'        => $this->keyPairName,
             'SecurityGroups' => [$this->securityGroupName,],
         ]);

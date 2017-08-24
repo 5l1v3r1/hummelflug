@@ -60,7 +60,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
             $elapsedTime += $result->getElapsedTime();
         }
 
-        return $elapsedTime / count($this->results);
+        if (count($this->results) > 0) {
+            return $elapsedTime / count($this->results);
+        }
+
+        return  0;
     }
 
     /**
@@ -88,7 +92,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
             $responseTimeAverage += $result->getResponseTimeAverage();
         }
 
-        return $responseTimeAverage / count($this->results);
+        if (count($this->results) > 0) {
+            return $responseTimeAverage / count($this->results);
+        }
+
+        return 0;
     }
 
     /**
