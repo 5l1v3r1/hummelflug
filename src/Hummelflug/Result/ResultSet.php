@@ -25,6 +25,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
     private $mark;
 
     /**
+     * @var array
+     */
+    private $additionalData = [];
+
+    /**
      * ResultSet constructor.
      * @param Result[] $results
      * @param string $attackId
@@ -245,5 +250,68 @@ class ResultSet implements ResultInterface, ResultSetInterface
     public function setMark($mark)
     {
         $this->mark = $mark;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getAdditionalData($name)
+    {
+        return $this->additionalData[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setAdditionalData($name, $value)
+    {
+        $this->additionalData[$name] = $value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAdditionalData()
+    {
+        return !empty($this->additionalData);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataKeys()
+    {
+        return array_keys($this->additionalData);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataValues()
+    {
+        return array_values($this->additionalData);
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __call($name, $arguments)
+    {
+        if (strpos($name, 'get') === 0) {
+            $property = str_replace('get', '', $name);
+
+            if (array_key_exists($property, $this->additionalData)) {
+                return $this->getAdditionalData($property);
+            }
+        }
+
+        throw new \Exception('Method ' . $name . ' does not exist.');
     }
 }

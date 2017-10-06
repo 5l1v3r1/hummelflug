@@ -20,4 +20,32 @@ interface ResultSetInterface extends ResultInterface
      * @return string
      */
     public function getAttackId();
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getAdditionalData($name);
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setAdditionalData($name, $value);
+
+    /**
+     * @return bool
+     */
+    public function hasAdditionalData();
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataKeys();
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataValues();
 }

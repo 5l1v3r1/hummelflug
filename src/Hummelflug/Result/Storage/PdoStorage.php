@@ -125,11 +125,11 @@ class PdoStorage implements StorageInterface
             foreach ($this->detailsTableMapping as $key => $value) {
                 $method = 'get' . $key;
 
-                if (!method_exists($result, $method)) {
+                try {
+                    $value = $result->$method();
+                } catch (\Exception $e) {
                     throw new \Exception('Invalid mapping key: ' . $key);
                 }
-
-                $value = $result->$method();
 
                 if ($value instanceof \DateTime) {
                     $value = $value->format('Y-m-d H:i:s');

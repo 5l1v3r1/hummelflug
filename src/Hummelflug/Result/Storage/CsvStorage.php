@@ -38,42 +38,54 @@ class CsvStorage implements StorageInterface
         }
 
         if ($summaryFileExists === false) {
-            fputcsv(
-                $fh,
-                [
-                    'AttackID',
-                    'Transactions',
-                    'ElapsedTime',
-                    'DataTransferred',
-                    'ResponseTimeAverage',
-                    'Concurrency',
-                    'TransactionsSuccessful',
-                    'TransactionsFailed',
-                    'LongestTransaction',
-                    'ShortestTransaction',
-                    'Availability',
-                    'Mark',
-                ]
+            $csvHeader = [
+                'AttackID',
+                'Transactions',
+                'ElapsedTime',
+                'DataTransferred',
+                'ResponseTimeAverage',
+                'Concurrency',
+                'TransactionsSuccessful',
+                'TransactionsFailed',
+                'LongestTransaction',
+                'ShortestTransaction',
+                'Availability',
+                'Mark',
+            ];
+
+            if ($resultSet->hasAdditionalData()) {
+                $csvHeader = array_merge(
+                    $csvHeader,
+                    $resultSet->getAdditionalDataKeys()
+                );
+            }
+
+            fputcsv($fh, $csvHeader);
+        }
+
+        $csvData = [
+            $resultSet->getAttackId(),
+            $resultSet->getTransactions(),
+            number_format($resultSet->getElapsedTime(), 2),
+            number_format($resultSet->getDataTransferred(), 2),
+            number_format($resultSet->getResponseTimeAverage(), 2),
+            number_format($resultSet->getConcurrency(), 2),
+            $resultSet->getTransactionsSuccessful(),
+            $resultSet->getTransactionsFailed(),
+            number_format($resultSet->getLongestTransaction(), 2),
+            number_format($resultSet->getShortestTransaction(), 2),
+            number_format($resultSet->getAvailability(), 2),
+            $resultSet->getMark(),
+        ];
+
+        if ($resultSet->hasAdditionalData()) {
+            $csvData = array_merge(
+                $csvData,
+                $resultSet->getAdditionalDataValues()
             );
         }
 
-        fputcsv(
-            $fh,
-            [
-                $resultSet->getAttackId(),
-                $resultSet->getTransactions(),
-                number_format($resultSet->getElapsedTime(), 2),
-                number_format($resultSet->getDataTransferred(), 2),
-                number_format($resultSet->getResponseTimeAverage(), 2),
-                number_format($resultSet->getConcurrency(), 2),
-                $resultSet->getTransactionsSuccessful(),
-                $resultSet->getTransactionsFailed(),
-                number_format($resultSet->getLongestTransaction(), 2),
-                number_format($resultSet->getShortestTransaction(), 2),
-                number_format($resultSet->getAvailability(), 2),
-                $resultSet->getMark(),
-            ]
-        );
+        fputcsv($fh, $csvData);
 
         fclose($fh);
 
@@ -91,45 +103,57 @@ class CsvStorage implements StorageInterface
         }
 
         if ($detailsFileExists === false) {
-            fputcsv(
-                $fh,
-                [
-                    'AttackID',
-                    'InstanceId',
-                    'Transactions',
-                    'ElapsedTime',
-                    'DataTransferred',
-                    'ResponseTimeAverage',
-                    'Concurrency',
-                    'TransactionsSuccessful',
-                    'TransactionsFailed',
-                    'LongestTransaction',
-                    'ShortestTransaction',
-                    'Availability',
-                    'Mark',
-                ]
-            );
+            $csvHeader = [
+                'AttackID',
+                'InstanceId',
+                'Transactions',
+                'ElapsedTime',
+                'DataTransferred',
+                'ResponseTimeAverage',
+                'Concurrency',
+                'TransactionsSuccessful',
+                'TransactionsFailed',
+                'LongestTransaction',
+                'ShortestTransaction',
+                'Availability',
+                'Mark',
+            ];
+
+            if ($resultSet->hasAdditionalData()) {
+                $csvHeader = array_merge(
+                    $csvHeader,
+                    $resultSet->getAdditionalDataKeys()
+                );
+            }
+
+            fputcsv($fh, $csvHeader);
         }
 
         foreach ($resultSet->getResults() as $result) {
-            fputcsv(
-                $fh,
-                [
-                    $result->getAttackId(),
-                    $result->getInstanceId(),
-                    $result->getTransactions(),
-                    number_format($result->getElapsedTime(), 2),
-                    number_format($result->getDataTransferred(), 2),
-                    number_format($result->getResponseTimeAverage(), 2),
-                    number_format($result->getConcurrency(), 2),
-                    $result->getTransactionsSuccessful(),
-                    $result->getTransactionsFailed(),
-                    number_format($result->getLongestTransaction(), 2),
-                    number_format($result->getShortestTransaction(), 2),
-                    number_format($result->getAvailability(), 2),
-                    $result->getMark(),
-                ]
-            );
+            $csvData = [
+                $result->getAttackId(),
+                $result->getInstanceId(),
+                $result->getTransactions(),
+                number_format($result->getElapsedTime(), 2),
+                number_format($result->getDataTransferred(), 2),
+                number_format($result->getResponseTimeAverage(), 2),
+                number_format($result->getConcurrency(), 2),
+                $result->getTransactionsSuccessful(),
+                $result->getTransactionsFailed(),
+                number_format($result->getLongestTransaction(), 2),
+                number_format($result->getShortestTransaction(), 2),
+                number_format($result->getAvailability(), 2),
+                $result->getMark(),
+            ];
+
+            if ($resultSet->hasAdditionalData()) {
+                $csvData = array_merge(
+                    $csvData,
+                    $resultSet->getAdditionalDataValues()
+                );
+            }
+
+            fputcsv($fh, $csvData);
         }
 
         fclose($fh);
