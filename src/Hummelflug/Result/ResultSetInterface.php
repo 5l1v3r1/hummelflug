@@ -29,10 +29,9 @@ interface ResultSetInterface extends ResultInterface
     public function getAdditionalData($name);
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param string $additionalData
      */
-    public function setAdditionalData($name, $value);
+    public function setAdditionalData($additionalData);
 
     /**
      * @return bool

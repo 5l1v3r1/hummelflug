@@ -63,6 +63,11 @@ class AttackCommand extends Command
      */
     private $keyFilePath;
 
+    /**
+     * @var array
+     */
+    private $additionalData = [];
+
     protected function configure()
     {
         $this
@@ -136,6 +141,12 @@ class AttackCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'AWSSecretKey'
+            )
+            ->addOption(
+                'log-additional-data',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'additional JSON formatted data to log'
             );
     }
 
@@ -150,6 +161,17 @@ class AttackCommand extends Command
 
             if (!file_exists($this->file)) {
                 throw new InvalidArgumentException('File ' . $this->file . ' does not exists.');
+            }
+        }
+
+        if (!is_null($input->getOption('log-additional-data'))) {
+            $this->additionalData = json_decode(
+                $input->getOption('log-additional-data'),
+                true
+            );
+
+            if ($this->additionalData === null) {
+                throw new \Exception(json_last_error_msg());
             }
         }
 
@@ -414,6 +436,7 @@ class AttackCommand extends Command
 
         $resultSet->setStart($this->start);
         $resultSet->setMark($this->mark);
+        $resultSet->setAdditionalData($this->additionalData);
 
         return $resultSet;
     }

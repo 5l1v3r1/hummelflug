@@ -263,12 +263,11 @@ class ResultSet implements ResultInterface, ResultSetInterface
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param string $additionalData
      */
-    public function setAdditionalData($name, $value)
+    public function setAdditionalData($additionalData)
     {
-        $this->additionalData[$name] = $value;
+        $this->additionalData = $additionalData;
     }
 
     /**
