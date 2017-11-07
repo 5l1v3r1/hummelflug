@@ -306,4 +306,24 @@ class Result implements ResultInterface
     {
         $this->mark = $mark;
     }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __call($name, $arguments)
+    {
+        if (strpos($name, 'get') === 0) {
+            $property = str_replace('get', '', $name);
+
+            if (array_key_exists($property, $this->additionalData)) {
+                return $this->getAdditionalData($property);
+            }
+        }
+
+        throw new \Exception('Method ' . $name . ' does not exist.');
+    }
 }

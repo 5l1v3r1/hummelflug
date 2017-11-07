@@ -80,11 +80,11 @@ class PdoStorage implements StorageInterface
         foreach ($this->summaryTableMapping as $key => $value) {
             $method = 'get' . $key;
 
-            if (!method_exists($resultSet, $method)) {
-                throw new \Exception('Invalid mapping key: ' . $key);
+            try {
+                $value = $resultSet->$method();
+            } catch (\Exception $e) {
+                throw new \Exception('Invalid mapping key: ' . $key . ' (' . $e->getMessage() . ')');
             }
-
-            $value = $resultSet->$method();
 
             if ($value instanceof \DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
@@ -125,11 +125,11 @@ class PdoStorage implements StorageInterface
             foreach ($this->detailsTableMapping as $key => $value) {
                 $method = 'get' . $key;
 
-                if (!method_exists($result, $method)) {
-                    throw new \Exception('Invalid mapping key: ' . $key);
+                try {
+                    $value = $result->$method();
+                } catch (\Exception $e) {
+                    throw new \Exception('Invalid mapping key: ' . $key . ' (' . $e->getMessage() . ')');
                 }
-
-                $value = $result->$method();
 
                 if ($value instanceof \DateTime) {
                     $value = $value->format('Y-m-d H:i:s');
@@ -299,5 +299,4 @@ class PdoStorage implements StorageInterface
     {
         $this->detailsTable = $detailsTable;
     }
-
 }
