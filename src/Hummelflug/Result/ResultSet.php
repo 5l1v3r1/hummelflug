@@ -2,6 +2,10 @@
 
 namespace Hummelflug\Result;
 
+/**
+ * Class ResultSet
+ * @package Hummelflug\Result
+ */
 class ResultSet implements ResultInterface, ResultSetInterface
 {
     /**

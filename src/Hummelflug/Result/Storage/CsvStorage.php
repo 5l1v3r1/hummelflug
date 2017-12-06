@@ -4,6 +4,10 @@ namespace Hummelflug\Result\Storage;
 
 use Hummelflug\Result\ResultSetInterface;
 
+/**
+ * Class CsvStorage
+ * @package Hummelflug\Result\Storage
+ */
 class CsvStorage implements StorageInterface
 {
     /**
@@ -18,7 +22,8 @@ class CsvStorage implements StorageInterface
 
     /**
      * @param ResultSetInterface $resultSet
-     * @return mixed
+     *
+     * @throws \Exception
      */
     public function store(ResultSetInterface $resultSet)
     {
@@ -27,6 +32,12 @@ class CsvStorage implements StorageInterface
             ->storeDetails($resultSet);
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return CsvStorage
+     * @throws \Exception
+     */
     private function storeSummary(ResultSetInterface $resultSet)
     {
         $summaryFileExists = file_exists($this->summaryPath);
@@ -92,6 +103,12 @@ class CsvStorage implements StorageInterface
         return $this;
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return CsvStorage
+     * @throws \Exception
+     */
     private function storeDetails(ResultSetInterface $resultSet)
     {
         $detailsFileExists = file_exists($this->detailsPath);

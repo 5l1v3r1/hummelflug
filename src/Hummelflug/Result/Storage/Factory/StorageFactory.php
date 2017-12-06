@@ -4,6 +4,10 @@ namespace Hummelflug\Result\Storage\Factory;
 
 use Hummelflug\Result\Storage\StorageInterface;
 
+/**
+ * Class StorageFactory
+ * @package Hummelflug\Result\Storage\Factory
+ */
 class StorageFactory
 {
     /**

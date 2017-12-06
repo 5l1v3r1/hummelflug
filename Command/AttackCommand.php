@@ -426,6 +426,7 @@ class AttackCommand extends Command
             $result->setInstanceId(explode('.', $filename)[2]);
             $result->setStart($this->start);
             $result->setMark($this->mark);
+            $result->setAdditionalData($this->additionalData);
 
             $results[] = $result;
 

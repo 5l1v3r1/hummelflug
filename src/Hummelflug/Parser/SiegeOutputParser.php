@@ -2,9 +2,12 @@
 
 namespace Hummelflug\Parser;
 
-
 use Hummelflug\Result\Result;
 
+/**
+ * Class SiegeOutputParser
+ * @package Hummelflug\Parser
+ */
 class SiegeOutputParser
 {
     /**
