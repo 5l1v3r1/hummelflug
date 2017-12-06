@@ -4,6 +4,10 @@ namespace Hummelflug\Result\Storage;
 
 use Hummelflug\Result\ResultSetInterface;
 
+/**
+ * Class PdoStorage
+ * @package Hummelflug\Result\Storage
+ */
 class PdoStorage implements StorageInterface
 {
     /**
@@ -48,7 +52,9 @@ class PdoStorage implements StorageInterface
 
     /**
      * @param ResultSetInterface $resultSet
+     *
      * @return mixed
+     * @throws \Exception
      */
     public function store(ResultSetInterface $resultSet)
     {
@@ -58,6 +64,12 @@ class PdoStorage implements StorageInterface
         $this->storeDetails($resultSet);
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return PdoStorage
+     * @throws \Exception
+     */
     private function storeSummary(ResultSetInterface $resultSet)
     {
         if ($this->summaryTable === null) {
@@ -102,6 +114,12 @@ class PdoStorage implements StorageInterface
         return $this;
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return PdoStorage
+     * @throws \Exception
+     */
     private function storeDetails(ResultSetInterface $resultSet)
     {
         if ($this->detailsTable === null) {
@@ -234,6 +252,11 @@ class PdoStorage implements StorageInterface
         $this->summaryTable = $summaryTable;
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return array
+     */
     private function getDefaultSummaryTableMapping(ResultSetInterface $resultSet)
     {
         $mapping = [];
@@ -251,6 +274,11 @@ class PdoStorage implements StorageInterface
         return $mapping;
     }
 
+    /**
+     * @param ResultSetInterface $resultSet
+     *
+     * @return array
+     */
     private function getDefaultDetailsTableMapping(ResultSetInterface $resultSet)
     {
         $mapping = [];
@@ -278,10 +306,16 @@ class PdoStorage implements StorageInterface
 
     /**
      * @param array $detailsTableMapping
+     *
+     * @throws \Exception
      */
     public function setDetailsTableMapping($detailsTableMapping)
     {
-        $this->detailsTableMapping = $detailsTableMapping;
+        $this->detailsTableMapping = json_decode($detailsTableMapping, true);
+
+        if ($this->detailsTableMapping === false) {
+            throw new \Exception('Invalid summary table mapping. Check your configuration, please!');
+        }
     }
 
     /**

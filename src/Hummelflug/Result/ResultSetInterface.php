@@ -2,6 +2,10 @@
 
 namespace Hummelflug\Result;
 
+/**
+ * Interface ResultSetInterface
+ * @package Hummelflug\Result
+ */
 interface ResultSetInterface extends ResultInterface
 {
     /**

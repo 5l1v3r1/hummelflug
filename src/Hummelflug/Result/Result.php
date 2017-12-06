@@ -2,6 +2,10 @@
 
 namespace Hummelflug\Result;
 
+/**
+ * Class Result
+ * @package Hummelflug\Result
+ */
 class Result implements ResultInterface
 {
     /**
@@ -24,10 +28,6 @@ class Result implements ResultInterface
      */
     private $responseTimeAverage;
 
-//  string(41) "Transaction rate:         8.43 trans/sec
-
-//  string(33) "Throughput:                       0.00 MB/sec
-
     /**
      * @var float
      */
@@ -42,8 +42,6 @@ class Result implements ResultInterface
      * @var integer
      */
     private $transactionsFailed;
-
-//  string(34) "Failed transactions:                 0
 
     /**
      * @var float
@@ -74,6 +72,11 @@ class Result implements ResultInterface
      * @var string
      */
     private $mark;
+
+    /**
+     * @var array
+     */
+    private $additionalData = [];
 
     /**
      * @param mixed $transactions
@@ -305,6 +308,48 @@ class Result implements ResultInterface
     public function setMark($mark)
     {
         $this->mark = $mark;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getAdditionalData($name)
+    {
+        return $this->additionalData[$name];
+    }
+
+    /**
+     * @param string $additionalData
+     */
+    public function setAdditionalData($additionalData)
+    {
+        $this->additionalData = $additionalData;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAdditionalData()
+    {
+        return !empty($this->additionalData);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataKeys()
+    {
+        return array_keys($this->additionalData);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalDataValues()
+    {
+        return array_values($this->additionalData);
     }
 
     /**
